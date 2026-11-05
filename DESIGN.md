@@ -198,7 +198,7 @@ sequenceDiagram
     actor Operator
     participant Systemd
     participant Agent as router-agent
-    participant Config as Local config/key files
+    participant Config as Local configuration and keys
     participant Kernel as Linux networking
     participant WG as WireGuard
     participant Peer as Remote router
@@ -209,8 +209,8 @@ sequenceDiagram
     Config-->>Agent: parsed node and peer settings
     Agent-->>Systemd: validation success or startup failure
     Systemd->>Agent: start agent with config path
-    Agent->>Kernel: acquire instance lock; inspect interface/routes
-    Agent->>Kernel: create owned WireGuard interface and assign address/MTU
+    Agent->>Kernel: acquire instance lock and inspect interface and routes
+    Agent->>Kernel: create owned WireGuard interface; assign address and MTU
     Agent->>WG: configure local key, listen port, peer, allowed prefixes
     Agent->>Kernel: add owned routes for remote prefixes
     Agent-->>Operator: log tunnel started
