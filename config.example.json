@@ -1,0 +1,18 @@
+{
+  "interface": "wg-crosscloud",
+  "addresses": [
+    "10.200.0.1/30"
+  ],
+  "mtu": 1420,
+  "listen_port": 51820,
+  "private_key_file": "/etc/crosscloud-router/private.key",
+  "peer": {
+    "public_key": "REPLACE_WITH_BASE64_WIREGUARD_PUBLIC_KEY",
+    "endpoint": "REPLACE_WITH_PEER_PUBLIC_IP:51820",
+    "allowed_ips": [
+      "10.200.0.2/32",
+      "10.20.0.0/16"
+    ],
+    "persistent_keepalive_seconds": 25
+  }
+}
