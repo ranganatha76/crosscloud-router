@@ -203,33 +203,33 @@ sequenceDiagram
     participant WG as WireGuard
     participant Peer as Remote router
 
-    Operator->>Systemd: enable/start router instance
-    Systemd->>Agent: run config validation (--check)
-    Agent->>Config: read config and protected key files
+    Operator->>Systemd: start router instance
+    Systemd->>Agent: validate configuration
+    Agent->>Config: read config and protected keys
     Config-->>Agent: parsed node and peer settings
     Agent-->>Systemd: validation success or startup failure
-    Systemd->>Agent: start agent with config path
-    Agent->>Kernel: acquire instance lock and inspect interface and routes
-    Agent->>Kernel: create owned WireGuard interface; assign address and MTU
-    Agent->>WG: configure local key, listen port, peer, allowed prefixes
-    Agent->>Kernel: add owned routes for remote prefixes
-    Agent-->>Operator: log tunnel started
-    WG->>Peer: encrypted UDP handshake/data as needed
+    Systemd->>Agent: launch agent with config path
+    Agent->>Kernel: acquire lock and inspect network state
+    Agent->>Kernel: create tunnel interface and assign address and MTU
+    Agent->>WG: configure keys peer and allowed prefixes
+    Agent->>Kernel: add routes for remote prefixes
+    Agent-->>Operator: report tunnel started
+    WG->>Peer: send encrypted UDP handshake and data
     loop Every health interval
-        Agent->>Kernel: inspect interface and owned routes
-        Agent->>WG: read peer handshake/counters
-        Agent-->>Operator: log health state
+        Agent->>Kernel: inspect interface and routes
+        Agent->>WG: read peer handshake and counters
+        Agent-->>Operator: report health state
     end
-    Operator->>Systemd: reload after coordinated key-file update
-    Systemd->>Agent: SIGHUP
-    Agent->>Config: re-read and validate config/key files
-    Agent->>Agent: reject topology changes; accept key-only changes
-    Agent->>WG: apply local private/preshared key update
-    Agent-->>Operator: log reload result
+    Operator->>Systemd: reload after coordinated key update
+    Systemd->>Agent: send reload signal
+    Agent->>Config: read and validate config and keys
+    Agent->>Agent: accept key changes only
+    Agent->>WG: apply local key updates
+    Agent-->>Operator: report reload result
     Operator->>Systemd: stop service
-    Systemd->>Agent: SIGTERM
-    Agent->>Kernel: remove only agent-owned routes and tunnel interface
-    Agent-->>Systemd: exit
+    Systemd->>Agent: send termination signal
+    Agent->>Kernel: remove managed routes and tunnel interface
+    Agent-->>Systemd: exit cleanly
 ```
 
 ### Startup details
